@@ -7,9 +7,32 @@ import java.io.*;
 
 public class SchedulingAlgorithm {
 
-    public static Results Run(int runtime, Vector processVector, Results result) {
-		int quantum = 10;
 
+	public static int getNextProcessIndex(Vector processVector, int currentIndex) {
+		int size = processVector.size();
+		for (int offset = 1; offset <= size; offset++) {
+			int nextIndex = (currentIndex + offset) % size;
+			sProcess nextProcess = (sProcess) processVector.elementAt(nextIndex);
+			if (nextProcess.cpudone < nextProcess.cputime) {
+				return nextIndex;
+			}
+		}
+		return currentIndex; // si todos terminaron (debería haberse detectado antes)
+	}
+
+	public static double quantumIO(Vector processVector) {
+		double totalIO = 0.0;
+		int numProcesos = processVector.size();
+
+		for (int i = 0; i < numProcesos; i++) {
+			sProcess process = (sProcess) processVector.elementAt(i);
+			totalIO += process.numblocked;
+		}
+		return (double) totalIO / numProcesos;
+	}
+
+
+    public static Results Run(int runtime, Vector processVector, Results result) {
         int i = 0;
         int comptime = 0;
         int currentProcess = 0;
@@ -17,6 +40,9 @@ public class SchedulingAlgorithm {
         int size = processVector.size();
         int completed = 0;
         String resultsFile = "Summary-Processes";
+		//int quantum = (int) Math.ceil(quantumIO(processVector));
+		int quantum = 100;
+		int quantumCounter = 0;
 
         result.schedulingType = "Batch (Nonpreemptive)";
         result.schedulingName = "First-Come First-Served";
@@ -42,17 +68,13 @@ public class SchedulingAlgorithm {
 
                     if (completed == size) {
                         result.compuTime = comptime;
+							out.println("Este es el fin");
                         out.close();
                         return result;
                     }
 
-                    for (i = size - 1; i >= 0; i--) {
-                        process = (sProcess) processVector.elementAt(i);
-                        if (process.cpudone < process.cputime) {
-                            currentProcess = i;
-                        }
-                    }
-
+					currentProcess = getNextProcessIndex(processVector, currentProcess);
+					quantumCounter = 0;
                     process = (sProcess) processVector.elementAt(currentProcess);
                     out.println("Process: " + currentProcess + " registered... (" +
                                 process.cputime + " " + process.ioblocking + " " +
@@ -68,21 +90,25 @@ public class SchedulingAlgorithm {
                     process.ionext = 0;
                     previousProcess = currentProcess;
 
-					if (previousProcess == size - 1) {
-						currentProcess = 0;
-					}
-                    for (i = size - 1; i >= 0; i--) {
-                        process = (sProcess) processVector.elementAt(i);
-                        if (process.cpudone < process.cputime && previousProcess < i) {
-                            currentProcess = i;
-                        }
-                    }
-
+					currentProcess = getNextProcessIndex(processVector, currentProcess);
+					quantumCounter = 0;
                     process = (sProcess) processVector.elementAt(currentProcess);
                     out.println("Process: " + currentProcess + " registered... (" +
                                 process.cputime + " " + process.ioblocking + " " +
                                 process.cpudone + " " + process.cpudone + ")");
                 }
+
+				quantumCounter++;
+
+				if (quantumCounter == quantum) {
+					previousProcess = currentProcess;
+					currentProcess = getNextProcessIndex(processVector, currentProcess);
+					process = (sProcess) processVector.elementAt(currentProcess);
+					out.println("Process: " + currentProcess + " (por quantum) registrado... (" +
+								process.cputime + " " + process.ioblocking + " " + 
+								process.cpudone + " " + process.cpudone + ")");
+					quantumCounter = 0;
+				}
 
                 process.cpudone++;
                 if (process.ioblocking > 0) {
@@ -92,11 +118,13 @@ public class SchedulingAlgorithm {
                 comptime++;
             }
 
+
             out.close();
 
         } catch (IOException e) {
             // Handle exceptions
         }
+
 
         result.compuTime = comptime;
         return result;
