@@ -8,6 +8,8 @@ import java.io.*;
 public class SchedulingAlgorithm {
 
     public static Results Run(int runtime, Vector processVector, Results result) {
+		int quantum = 10;
+
         int i = 0;
         int comptime = 0;
         int currentProcess = 0;
@@ -31,6 +33,7 @@ public class SchedulingAlgorithm {
 
             while (comptime < runtime) {
 
+				// Cuando el proceso termina
                 if (process.cpudone == process.cputime) {
                     completed++;
                     out.println("Process: " + currentProcess + " completed... (" +
@@ -56,6 +59,7 @@ public class SchedulingAlgorithm {
                                 process.cpudone + " " + process.cpudone + ")");
                 }
 
+				// El proceso se bloquea
                 if (process.ioblocking == process.ionext) {
                     out.println("Process: " + currentProcess + " I/O blocked... (" +
                                 process.cputime + " " + process.ioblocking + " " +
@@ -64,9 +68,12 @@ public class SchedulingAlgorithm {
                     process.ionext = 0;
                     previousProcess = currentProcess;
 
+					if (previousProcess == size - 1) {
+						currentProcess = 0;
+					}
                     for (i = size - 1; i >= 0; i--) {
                         process = (sProcess) processVector.elementAt(i);
-                        if (process.cpudone < process.cputime && previousProcess != i) {
+                        if (process.cpudone < process.cputime && previousProcess < i) {
                             currentProcess = i;
                         }
                     }
