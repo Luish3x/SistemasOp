@@ -17,7 +17,7 @@ public class Scheduling {
   private static int standardDev = 100;
   private static int runtime = 1000;
   private static Vector processVector = new Vector();
-  private static Results result = new Results("null","null",0);
+  private static Results result = new Results("null", "null", 0, 0);
   private static String resultsFile = "Summary-Results";
 
   private static void Init(String file) {
@@ -118,12 +118,13 @@ public class Scheduling {
     try {
       //BufferedWriter out = new BufferedWriter(new FileWriter(resultsFile));
       PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
-      out.println("Scheduling Type: " + result.schedulingType);
+      out.println("Scheduling Type: " + result.schedulingType );
       out.println("Scheduling Name: " + result.schedulingName);
       out.println("Simulation Run Time: " + result.compuTime);
+	  out.println("Quantum: " + result.quantum);
       out.println("Mean: " + meanDev);
       out.println("Standard Deviation: " + standardDev);
-      out.println("Process #\tCPU Time\tIO Blocking\tCPU Completed\tCPU Blocked");
+      out.println("Process #\t\t\tCPU Time\t\t\tIO Blocking\t\t\tCPU Completed\t\t\tCPU Blocked");
       for (i = 0; i < processVector.size(); i++) {
         sProcess process = (sProcess) processVector.elementAt(i);
         out.print(Integer.toString(i));

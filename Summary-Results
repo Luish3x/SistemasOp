@@ -1,16 +1,17 @@
-Scheduling Type: Batch (Nonpreemptive)
-Scheduling Name: First-Come First-Served
-Simulation Run Time: 11104
+Scheduling Type: Preemptive
+Scheduling Name: Round Robin
+Simulation Run Time: 10810
+Quantum: 122
 Mean: 1100
 Standard Deviation: 100
-Process #	CPU Time	IO Blocking	CPU Completed	CPU Blocked
-0		1015 (ms)	200 (ms)	1015 (ms)	5 times
-1		1283 (ms)	60 (ms)		1283 (ms)	21 times
-2		1230 (ms)	50 (ms)		1230 (ms)	24 times
-3		1237 (ms)	150 (ms)	1237 (ms)	8 times
-4		1049 (ms)	100 (ms)	1049 (ms)	10 times
-5		1175 (ms)	70 (ms)		1175 (ms)	16 times
-6		950 (ms)	200 (ms)	950 (ms)	4 times
-7		1024 (ms)	180 (ms)	1024 (ms)	5 times
-8		1188 (ms)	50 (ms)		1188 (ms)	23 times
-9		1047 (ms)	160 (ms)	1047 (ms)	6 times
+Process #			CPU Time			IO Blocking			CPU Completed			CPU Blocked
+0		1153 (ms)	200 (ms)	1153 (ms)	5 times
+1		1031 (ms)	60 (ms)		1031 (ms)	8 times
+2		1003 (ms)	50 (ms)		1003 (ms)	8 times
+3		1104 (ms)	150 (ms)	1104 (ms)	7 times
+4		1046 (ms)	100 (ms)	1046 (ms)	8 times
+5		1157 (ms)	70 (ms)		1157 (ms)	9 times
+6		967 (ms)	200 (ms)	967 (ms)	4 times
+7		954 (ms)	180 (ms)	954 (ms)	5 times
+8		1152 (ms)	50 (ms)		1152 (ms)	9 times
+9		1285 (ms)	160 (ms)	1285 (ms)	8 times
