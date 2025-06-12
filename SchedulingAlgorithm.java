@@ -20,15 +20,15 @@ public class SchedulingAlgorithm {
 		return currentIndex; // si todos terminaron (debería haberse detectado antes)
 	}
 
-	public static double quantumIO(Vector processVector) {
-		double totalIO = 0.0;
+	public static int quantumIO(Vector processVector) {
+		int totalIO = 0;
 		int numProcesos = processVector.size();
 
 		for (int i = 0; i < numProcesos; i++) {
 			sProcess process = (sProcess) processVector.elementAt(i);
-			totalIO += process.numblocked;
+			totalIO += process.ioblocking;
 		}
-		return (double) totalIO / numProcesos;
+		return totalIO / numProcesos;
 	}
 
 
@@ -40,9 +40,6 @@ public class SchedulingAlgorithm {
         int size = processVector.size();
         int completed = 0;
         String resultsFile = "Summary-Processes";
-		//int quantum = (int) Math.ceil(quantumIO(processVector));
-		int quantum = 100;
-		int quantumCounter = 0;
 
         result.schedulingType = "Batch (Nonpreemptive)";
         result.schedulingName = "First-Come First-Served";
@@ -52,6 +49,7 @@ public class SchedulingAlgorithm {
             // OutputStream out = new FileOutputStream(resultsFile);
             PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
             sProcess process = (sProcess) processVector.elementAt(currentProcess);
+			int quantum = quantumIO(processVector);
 
             out.println("Process: " + currentProcess + " registered... (" +
                         process.cputime + " " + process.ioblocking + " " +
@@ -74,7 +72,6 @@ public class SchedulingAlgorithm {
                     }
 
 					currentProcess = getNextProcessIndex(processVector, currentProcess);
-					quantumCounter = 0;
                     process = (sProcess) processVector.elementAt(currentProcess);
                     out.println("Process: " + currentProcess + " registered... (" +
                                 process.cputime + " " + process.ioblocking + " " +
@@ -82,41 +79,58 @@ public class SchedulingAlgorithm {
                 }
 
 				// El proceso se bloquea
-                if (process.ioblocking == process.ionext) {
-                    out.println("Process: " + currentProcess + " I/O blocked... (" +
-                                process.cputime + " " + process.ioblocking + " " +
-                                process.cpudone + " " + process.cpudone + ")");
-                    process.numblocked++;
-                    process.ionext = 0;
-                    previousProcess = currentProcess;
 
-					currentProcess = getNextProcessIndex(processVector, currentProcess);
-					quantumCounter = 0;
-                    process = (sProcess) processVector.elementAt(currentProcess);
-                    out.println("Process: " + currentProcess + " registered... (" +
-                                process.cputime + " " + process.ioblocking + " " +
-                                process.cpudone + " " + process.cpudone + ")");
-                }
+				if (quantum > process.ioblocking) {
+					// Se ejecuta con quantum
+					out.println("Process: " + currentProcess + " ejecutando con QUANTUM de " + quantum + " unidades.");
 
-				quantumCounter++;
+					int steps = 0;
+					while (steps < quantum && process.cpudone < process.cputime) {
+						process.cpudone++;
+						if (process.ioblocking > 0) {
+							process.ionext++;
+							if (process.ionext == process.ioblocking) {
+								out.println("Process: " + currentProcess + " I/O blocked durante quantum... (" +
+											process.cputime + " " + process.ioblocking + " " +
+											process.cpudone + " " + process.cpudone + ")");
+								process.numblocked++;
+								process.ionext = 0;
 
-				if (quantumCounter == quantum) {
-					previousProcess = currentProcess;
-					currentProcess = getNextProcessIndex(processVector, currentProcess);
-					process = (sProcess) processVector.elementAt(currentProcess);
-					out.println("Process: " + currentProcess + " (por quantum) registrado... (" +
-								process.cputime + " " + process.ioblocking + " " + 
-								process.cpudone + " " + process.cpudone + ")");
-					quantumCounter = 0;
+								currentProcess = getNextProcessIndex(processVector, currentProcess);
+								process = (sProcess) processVector.elementAt(currentProcess);
+								out.println("Process: " + currentProcess + " registered... (" +
+											process.cputime + " " + process.ioblocking + " " +
+											process.cpudone + " " + process.cpudone + ")");
+								break;
+							}
+						}
+						steps++;
+						comptime++;
+					}
+				} else {
+					// Se mantiene la lógica original de bloqueo por I/O
+					if (process.ioblocking == process.ionext) {
+						out.println("Process: " + currentProcess + " I/O blocked... (" +
+									process.cputime + " " + process.ioblocking + " " +
+									process.cpudone + " " + process.cpudone + ")");
+						process.numblocked++;
+						process.ionext = 0;
+
+						currentProcess = getNextProcessIndex(processVector, currentProcess);
+						process = (sProcess) processVector.elementAt(currentProcess);
+						out.println("Process: " + currentProcess + " registered... (" +
+									process.cputime + " " + process.ioblocking + " " +
+									process.cpudone + " " + process.cpudone + ")");
+					}
+
+					process.cpudone++;
+					if (process.ioblocking > 0) {
+						process.ionext++;
+					}
+
+					comptime++;
 				}
-
-                process.cpudone++;
-                if (process.ioblocking > 0) {
-                    process.ionext++;
-                }
-
-                comptime++;
-            }
+			}
 
 
             out.close();
