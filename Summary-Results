@@ -1,17 +1,17 @@
 Scheduling Type: Preemptive
 Scheduling Name: Round Robin
-Simulation Run Time: 10810
-Quantum: 122
+Simulation Run Time: 10333
+Quantum: 125
 Mean: 1100
 Standard Deviation: 100
 Process #			CPU Time			IO Blocking			CPU Completed			CPU Blocked
-0		1153 (ms)	200 (ms)	1153 (ms)	5 times
-1		1031 (ms)	60 (ms)		1031 (ms)	8 times
-2		1003 (ms)	50 (ms)		1003 (ms)	8 times
-3		1104 (ms)	150 (ms)	1104 (ms)	7 times
-4		1046 (ms)	100 (ms)	1046 (ms)	8 times
-5		1157 (ms)	70 (ms)		1157 (ms)	9 times
-6		967 (ms)	200 (ms)	967 (ms)	4 times
-7		954 (ms)	180 (ms)	954 (ms)	5 times
-8		1152 (ms)	50 (ms)		1152 (ms)	9 times
-9		1285 (ms)	160 (ms)	1285 (ms)	8 times
+0					1100 (ms)			200 (ms)			1100 (ms)				5 times
+1					960 (ms)			60 (ms)				960 (ms)				7 times
+2					1052 (ms)			50 (ms)				1052 (ms)				8 times
+3					973 (ms)			150 (ms)			973 (ms)				6 times
+4					974 (ms)			100 (ms)			974 (ms)				7 times
+5					1109 (ms)			70 (ms)				1109 (ms)				8 times
+6					990 (ms)			200 (ms)			990 (ms)				4 times
+7					1089 (ms)			180 (ms)			1089 (ms)				6 times
+8					1062 (ms)			50 (ms)				1062 (ms)				8 times
+9					1062 (ms)			160 (ms)			1062 (ms)				6 times

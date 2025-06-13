@@ -4,6 +4,8 @@ public class sProcess {
 	public int cpudone;
 	public int ionext;
 	public int numblocked;
+
+
 	public int qnext;
 
 	public sProcess (int cputime, int ioblocking, int cpudone, int ionext, int numblocked) {

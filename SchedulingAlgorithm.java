@@ -4,10 +4,11 @@
 
 import java.util.Vector;
 import java.io.*;
+import java.util.Collections;
 
 public class SchedulingAlgorithm {
 
-
+	// funcion que encuentra el siguiente indice
 	public static int getNextProcessIndex(Vector processVector, int currentIndex) {
 		int size = processVector.size();
 		for (int offset = 1; offset <= size; offset++) {
@@ -17,18 +18,38 @@ public class SchedulingAlgorithm {
 				return nextIndex;
 			}
 		}
-		return currentIndex; // si todos terminaron (debería haberse detectado antes)
+		return currentIndex;
 	}
 
+	// optiene la mitad del vector
+	public static int[] obtenerIndicesCentrales(Vector<Integer> vector) {
+        int size = vector.size();
+        int mitad = size / 2;
+
+        if (size % 2 == 0) {
+            // Tamaño PAR: mitad-1 y mitad
+            return new int[]{mitad - 1, mitad};
+        } else {
+            // Tamaño IMPAR: mitad y mitad+1
+            return new int[]{mitad, mitad + 1};
+        }
+    }
+
+	// funcion que calcula el promedio para despues ser usada como un quantum
 	public static int quantumIO(Vector processVector) {
-		int totalIO = 0;
 		int numProcesos = processVector.size();
+		Vector <Integer> vectorOrdenado = new Vector <Integer>();
 
 		for (int i = 0; i < numProcesos; i++) {
 			sProcess process = (sProcess) processVector.elementAt(i);
-			totalIO += process.ioblocking;
+			vectorOrdenado.add(process.ioblocking);
 		}
-		return totalIO / numProcesos;
+
+		Collections.sort(vectorOrdenado);
+		int[] centro = obtenerIndicesCentrales(vectorOrdenado);
+		int resultado = vectorOrdenado.get(centro[0]) + vectorOrdenado.get(centro[1]);
+
+		return resultado / 2;
 	}
 
 
@@ -51,6 +72,7 @@ public class SchedulingAlgorithm {
             PrintStream out = new PrintStream(new FileOutputStream(resultsFile));
             sProcess process = (sProcess) processVector.elementAt(currentProcess);
 
+			// Se registra el primer proceso
             out.println("Process: " + currentProcess + " registered... (" +
                         process.cputime + " " + process.ioblocking + " " +
                         process.cpudone + ")");
